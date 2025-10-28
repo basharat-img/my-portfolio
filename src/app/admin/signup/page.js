@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +34,30 @@ const signUpSchema = Yup.object({
 });
 
 export default function AdminSignUpPage() {
+  const router = useRouter();
   const [formStatus, setFormStatus] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const isAuthenticated =
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("isAdminAuthenticated") === "true";
+
+    if (isAuthenticated) {
+      router.replace("/admin");
+      return;
+    }
+
+    setIsCheckingAuth(false);
+  }, [router]);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-12">
+        <p className="text-sm font-medium uppercase tracking-[0.3em] text-zinc-500">Preparing admin access…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-12">
