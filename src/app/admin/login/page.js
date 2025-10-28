@@ -10,11 +10,9 @@ import { Label } from "@/components/ui/label";
 
 const validationSchema = Yup.object({
   email: Yup.string()
-    .trim()
     .email("Please enter a valid email address.")
     .required("Email is required."),
   password: Yup.string()
-    .transform((value) => (value ? value.trim() : value))
     .required("Password is required.")
     .matches(/^\S+$/, "Password must be exactly one word without spaces."),
 });
