@@ -4,23 +4,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const singleWordRegex = /^\S+$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateSingleWord = (value) => singleWordRegex.test(value.trim());
+  const validateEmail = (value) => emailRegex.test(value.trim());
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
 
-    if (!validateSingleWord(trimmedUsername)) {
-      setError("Username must be exactly one word without spaces.");
+    if (!validateEmail(trimmedEmail)) {
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -37,7 +39,7 @@ export default function AdminLoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: trimmedUsername,
+          email: trimmedEmail,
           password: trimmedPassword,
         }),
       });
@@ -63,25 +65,22 @@ export default function AdminLoginPage() {
         <div className="space-y-2 text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-zinc-500">Admin Area</p>
           <h1 className="text-3xl font-semibold">Sign in to manage content</h1>
-          <p className="text-sm text-zinc-400">
-            Default credentials: <span className="font-semibold">admin / secret</span>
-          </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label htmlFor="username" className="block text-sm font-medium uppercase tracking-wide text-zinc-400">
-              Username
+            <label htmlFor="email" className="block text-sm font-medium uppercase tracking-wide text-zinc-400">
+              Email
             </label>
             <input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
-              title="Enter a single word without spaces."
-              placeholder="Enter a single-word username"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              title="Enter a valid email address."
+              placeholder="you@example.com"
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-base text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -114,7 +113,7 @@ export default function AdminLoginPage() {
           </button>
         </form>
         <p className="text-center text-xs text-zinc-500">
-          Single-word credentials are required for access.
+          Passwords must be entered as a single word without spaces.
         </p>
       </div>
     </div>
