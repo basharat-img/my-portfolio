@@ -12,15 +12,10 @@ const signInSchema = Yup.object({
   email: Yup.string()
     .email("Please provide a valid email address.")
     .required("Email is required."),
-  username: Yup.string()
-    .matches(/^[A-Za-z0-9_]+$/, "Username can contain letters, numbers, and underscores only.")
-    .required("Username is required."),
   password: Yup.string()
+    .matches(/^[^\s]+$/, "Password must be a single word without spaces.")
     .min(8, "Password must be at least 8 characters long.")
     .required("Password is required."),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match.")
-    .required("Please confirm your password."),
 });
 
 export default function SignInPage() {
@@ -32,15 +27,13 @@ export default function SignInPage() {
         <CardHeader className="space-y-2">
           <CardTitle>Sign in to your account</CardTitle>
           <CardDescription>
-            Use your email and username combination to access your dashboard.
+            Use your email and password combination to access your dashboard.
           </CardDescription>
         </CardHeader>
         <Formik
           initialValues={{
             email: "",
-            username: "",
             password: "",
-            confirmPassword: "",
           }}
           validationSchema={signInSchema}
           onSubmit={async (values, { resetForm }) => {
@@ -71,61 +64,22 @@ export default function SignInPage() {
                     {(message) => <p className="text-sm text-red-500">{message}</p>}
                   </ErrorMessage>
                 </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Field name="username">
+                  <Label htmlFor="password">Password</Label>
+                  <Field name="password">
                     {({ field }) => (
                       <Input
-                        id="username"
-                        type="text"
-                        autoComplete="username"
-                        placeholder="your_username"
+                        id="password"
+                        type="password"
+                        autoComplete="current-password"
+                        placeholder="Enter your password"
                         {...field}
                       />
                     )}
                   </Field>
-                  <ErrorMessage name="username">
+                  <ErrorMessage name="password">
                     {(message) => <p className="text-sm text-red-500">{message}</p>}
                   </ErrorMessage>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Field name="password">
-                      {({ field }) => (
-                        <Input
-                          id="password"
-                          type="password"
-                          autoComplete="new-password"
-                          placeholder="Create a strong password"
-                          {...field}
-                        />
-                      )}
-                    </Field>
-                    <ErrorMessage name="password">
-                      {(message) => <p className="text-sm text-red-500">{message}</p>}
-                    </ErrorMessage>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm password</Label>
-                    <Field name="confirmPassword">
-                      {({ field }) => (
-                        <Input
-                          id="confirmPassword"
-                          type="password"
-                          autoComplete="new-password"
-                          placeholder="Re-enter your password"
-                          {...field}
-                        />
-                      )}
-                    </Field>
-                    <ErrorMessage name="confirmPassword">
-                      {(message) => <p className="text-sm text-red-500">{message}</p>}
-                    </ErrorMessage>
-                  </div>
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col items-stretch gap-4">
