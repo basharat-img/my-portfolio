@@ -42,6 +42,7 @@ export const createPublicApi = () => {
   const instance = axios.create({
     baseURL,
     headers: { Accept: "application/json" },
+    withCredentials: true,
   });
 
   configureCommonInterceptors(instance);
@@ -52,6 +53,7 @@ export const createAuthenticatedApi = (tokenOrGetter) => {
   const instance = axios.create({
     baseURL,
     headers: { Accept: "application/json" },
+    withCredentials: true,
   });
 
   instance.interceptors.request.use((config) => {

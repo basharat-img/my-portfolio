@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { findAdminByEmail } from "@/lib/models/admin";
 import { verifyPassword } from "@/lib/password";
+import {
+  ADMIN_TOKEN_COOKIE_NAME,
+  ADMIN_TOKEN_MAX_AGE,
+  createAdminToken,
+} from "@/lib/jwt";
 
 const SINGLE_WORD_PATTERN = /^\S+$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,7 +55,28 @@ export async function POST(request) {
       );
     }
 
-    return NextResponse.json({ success: true });
+    const token = createAdminToken(admin);
+
+    const response = NextResponse.json({
+      success: true,
+      message: "Signed in successfully.",
+      admin: {
+        email: admin.email,
+        username: admin.username,
+      },
+    });
+
+    response.cookies.set({
+      name: ADMIN_TOKEN_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: ADMIN_TOKEN_MAX_AGE,
+    });
+
+    return response;
   } catch (error) {
     console.error("Admin login error", error);
     return NextResponse.json(
