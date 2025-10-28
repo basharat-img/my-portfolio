@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
-import { getAdminsCollection } from "@/lib/mongodb";
-import { hashPassword } from "@/lib/password";
+import {
+  createAdmin,
+  findAdminByEmail,
+  findAdminByUsername,
+} from "@/lib/models/admin";
 
 const SINGLE_WORD_PATTERN = /^\S+$/;
 
 export async function POST(request) {
   try {
-    const { email, username, password } = await request.json();
+    const payload = await request.json();
+
+    const email = payload?.email?.trim();
+    const username = payload?.username?.trim();
+    const password = payload?.password?.trim();
 
     if (!email || !username || !password) {
       return NextResponse.json(
@@ -34,33 +41,23 @@ export async function POST(request) {
       );
     }
 
-    const admins = await getAdminsCollection();
-
-    const existing = await admins.findOne({
-      $or: [{ username }, { email }],
-    });
-
-    if (existing) {
-      const message =
-        existing.username === username
-          ? "An admin with that username already exists."
-          : "An admin with that email already exists.";
+    const existingByUsername = await findAdminByUsername(username);
+    if (existingByUsername) {
       return NextResponse.json(
-        { message },
+        { message: "An admin with that username already exists." },
         { status: 409 },
       );
     }
 
-    const hashedPassword = hashPassword(password);
-    const timestamp = new Date().toISOString();
+    const existingByEmail = await findAdminByEmail(email);
+    if (existingByEmail) {
+      return NextResponse.json(
+        { message: "An admin with that email already exists." },
+        { status: 409 },
+      );
+    }
 
-    await admins.insertOne({
-      email,
-      username,
-      password: hashedPassword,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    });
+    await createAdmin({ email, username, password });
 
     return NextResponse.json(
       { message: "Admin account created successfully." },

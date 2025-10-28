@@ -36,12 +36,50 @@ export default function SignInPage() {
             password: "",
           }}
           validationSchema={signInSchema}
-          onSubmit={async (values, { resetForm }) => {
+          onSubmit={async (values, { resetForm, setSubmitting }) => {
             setFormStatus(null);
-            await new Promise((resolve) => setTimeout(resolve, 600));
-            console.log("Submitted sign-in values", values);
-            setFormStatus({ type: "success", message: "Signed in successfully." });
-            resetForm();
+
+            try {
+              const response = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  email: values.email.trim(),
+                  password: values.password.trim(),
+                }),
+              });
+
+              let data = null;
+
+              try {
+                data = await response.json();
+              } catch (error) {
+                data = null;
+              }
+
+              if (!response.ok) {
+                const message = data?.message || "Unable to sign in.";
+                throw new Error(message);
+              }
+
+              setFormStatus({
+                type: "success",
+                message: "Signed in successfully.",
+              });
+              resetForm();
+            } catch (error) {
+              setFormStatus({
+                type: "error",
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to sign in.",
+              });
+            } finally {
+              setSubmitting(false);
+            }
           }}
         >
           {({ isSubmitting }) => (
