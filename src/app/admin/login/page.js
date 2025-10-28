@@ -1,61 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 
-const singleWordRegex = /^\S+$/;
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .trim()
+    .email("Please enter a valid email address.")
+    .required("Email is required."),
+  password: Yup.string()
+    .transform((value) => (value ? value.trim() : value))
+    .required("Password is required.")
+    .matches(/^\S+$/, "Password must be exactly one word without spaces."),
+});
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validateSingleWord = (value) => singleWordRegex.test(value.trim());
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const trimmedUsername = username.trim();
-    const trimmedPassword = password.trim();
-
-    if (!validateSingleWord(trimmedUsername)) {
-      setError("Username must be exactly one word without spaces.");
-      return;
-    }
-
-    if (!validateSingleWord(trimmedPassword)) {
-      setError("Password must be exactly one word without spaces.");
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      setError("");
-
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: trimmedUsername,
-          password: trimmedPassword,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Unable to sign in with those credentials.");
-      }
-
-      sessionStorage.setItem("isAdminAuthenticated", "true");
-      router.push("/admin");
-    } catch (submitError) {
-      setError(submitError.message || "Something went wrong while signing in.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4 py-12 text-zinc-50">
@@ -64,55 +29,111 @@ export default function AdminLoginPage() {
           <p className="text-sm uppercase tracking-[0.3em] text-zinc-500">Admin Area</p>
           <h1 className="text-3xl font-semibold">Sign in to manage content</h1>
           <p className="text-sm text-zinc-400">
-            Default credentials: <span className="font-semibold">admin / secret</span>
+            Default credentials: <span className="font-semibold">admin@example.com / secret</span>
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="username" className="block text-sm font-medium uppercase tracking-wide text-zinc-400">
-              Username
-            </label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
-              title="Enter a single word without spaces."
-              placeholder="Enter a single-word username"
-              className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-base text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium uppercase tracking-wide text-zinc-400">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              title="Enter a single word without spaces."
-              placeholder="Enter a single-word password"
-              className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-base text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </div>
-          {error ? (
-            <p className="text-sm font-medium text-rose-400" role="alert">
-              {error}
-            </p>
-          ) : null}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex w-full items-center justify-center rounded-xl bg-indigo-500 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-indigo-500/50"
-          >
-            {isSubmitting ? "Signing in..." : "Enter Admin Panel"}
-          </button>
-        </form>
+        <Formik
+          initialValues={{ email: "", password: "" }}
+          validationSchema={validationSchema}
+          onSubmit={async (values, { setSubmitting, setStatus }) => {
+            try {
+              setStatus(null);
+
+              const trimmedValues = {
+                email: values.email.trim(),
+                password: values.password.trim(),
+              };
+
+              const response = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(trimmedValues),
+              });
+
+              const data = await response.json();
+
+              if (!response.ok) {
+                throw new Error(data?.message || "Unable to sign in with those credentials.");
+              }
+
+              sessionStorage.setItem("isAdminAuthenticated", "true");
+              router.push("/admin");
+            } catch (error) {
+              setStatus({ error: error.message || "Something went wrong while signing in." });
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+        >
+          {({ status, isSubmitting, errors, touched }) => (
+            <Form className="space-y-6">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="email"
+                  className="text-sm font-medium uppercase tracking-wide text-zinc-400"
+                >
+                  Email
+                </Label>
+                <Field name="email">
+                  {({ field }) => (
+                    <Input
+                      {...field}
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="admin@example.com"
+                      title="Enter a valid email address without spaces."
+                      className="h-12 rounded-xl border border-zinc-700 bg-zinc-950 px-4 text-base text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-indigo-500 focus-visible:ring-offset-0"
+                    />
+                  )}
+                </Field>
+                {touched.email && errors.email ? (
+                  <p className="text-sm font-medium text-rose-400" role="alert">
+                    {errors.email}
+                  </p>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium uppercase tracking-wide text-zinc-400"
+                >
+                  Password
+                </Label>
+                <Field name="password">
+                  {({ field }) => (
+                    <Input
+                      {...field}
+                      id="password"
+                      type="password"
+                      autoComplete="current-password"
+                      placeholder="Enter a single-word password"
+                      title="Enter a single word without spaces."
+                      className="h-12 rounded-xl border border-zinc-700 bg-zinc-950 px-4 text-base text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-indigo-500 focus-visible:ring-offset-0"
+                    />
+                  )}
+                </Field>
+                {touched.password && errors.password ? (
+                  <p className="text-sm font-medium text-rose-400" role="alert">
+                    {errors.password}
+                  </p>
+                ) : null}
+              </div>
+              {status?.error ? (
+                <p className="text-sm font-medium text-rose-400" role="alert">
+                  {status.error}
+                </p>
+              ) : null}
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex w-full items-center justify-center rounded-xl bg-indigo-500 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-indigo-500/50"
+              >
+                {isSubmitting ? "Signing in..." : "Enter Admin Panel"}
+              </Button>
+            </Form>
+          )}
+        </Formik>
         <p className="text-center text-xs text-zinc-500">
           Single-word credentials are required for access.
         </p>

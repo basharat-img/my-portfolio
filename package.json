@@ -8,11 +8,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "formik": "^2.4.6",
     "mongodb": "^6.9.0",
     "mongoose": "^8.19.2",
     "next": "16.0.0",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
