@@ -3,7 +3,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "formik": ["./src/lib/formik"],
-      "yup": ["./src/lib/yup"]
+      "yup": ["./src/lib/yup"],
+      "axios": ["./src/lib/axios"]
     }
   }
 }

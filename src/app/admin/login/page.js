@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { publicApi } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -65,17 +67,7 @@ export default function AdminLoginPage() {
                 password: values.password.trim(),
               };
 
-              const response = await fetch("/api/admin/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(trimmedValues),
-              });
-
-              const data = await response.json();
-
-              if (!response.ok) {
-                throw new Error(data?.message || "Unable to sign in with those credentials.");
-              }
+              await publicApi.post(API_ENDPOINTS.ADMIN_LOGIN, trimmedValues);
 
               sessionStorage.setItem("isAdminAuthenticated", "true");
               router.push("/admin");

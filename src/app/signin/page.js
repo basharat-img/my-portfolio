@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { publicApi } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 const signInSchema = Yup.object({
   email: Yup.string()
@@ -40,33 +42,14 @@ export default function SignInPage() {
             setFormStatus(null);
 
             try {
-              const response = await fetch("/api/admin/login", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  email: values.email.trim(),
-                  password: values.password.trim(),
-                }),
+              const { data } = await publicApi.post(API_ENDPOINTS.ADMIN_LOGIN, {
+                email: values.email.trim(),
+                password: values.password.trim(),
               });
-
-              let data = null;
-
-              try {
-                data = await response.json();
-              } catch (error) {
-                data = null;
-              }
-
-              if (!response.ok) {
-                const message = data?.message || "Unable to sign in.";
-                throw new Error(message);
-              }
 
               setFormStatus({
                 type: "success",
-                message: "Signed in successfully.",
+                message: data?.message || "Signed in successfully.",
               });
               resetForm();
             } catch (error) {

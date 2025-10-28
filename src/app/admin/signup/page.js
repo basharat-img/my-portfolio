@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { publicApi } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 const signUpSchema = Yup.object({
   email: Yup.string()
@@ -86,21 +88,14 @@ export default function AdminSignUpPage() {
                 password: values.password.trim(),
               };
 
-              const response = await fetch("/api/admin/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
-
-              const result = await response.json();
-
-              if (!response.ok) {
-                throw new Error(result.message || "Unable to create admin account.");
-              }
+              const { data } = await publicApi.post(
+                API_ENDPOINTS.ADMIN_SIGNUP,
+                payload,
+              );
 
               setFormStatus({
                 type: "success",
-                message: result.message || "Admin account created successfully.",
+                message: data?.message || "Admin account created successfully.",
               });
               resetForm();
             } catch (error) {
