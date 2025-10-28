@@ -3,28 +3,58 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { publicApi } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+
 const singleWordRegex = /^\S+$/;
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [isAuthorised, setIsAuthorised] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [adminProfile, setAdminProfile] = useState(null);
   const [tagName, setTagName] = useState("");
   const [tagFeedback, setTagFeedback] = useState({ type: "", message: "" });
 
   useEffect(() => {
-    const isAuthenticated =
-      typeof window !== "undefined" && sessionStorage.getItem("isAdminAuthenticated");
+    let isActive = true;
 
-    if (!isAuthenticated) {
-      setIsAuthorised(false);
-      setIsCheckingAuth(false);
-      router.replace("/admin/login");
-      return;
-    }
+    const verifySession = async () => {
+      try {
+        const { data } = await publicApi.get(API_ENDPOINTS.ADMIN_SESSION);
 
-    setIsAuthorised(true);
-    setIsCheckingAuth(false);
+        if (!isActive) {
+          return;
+        }
+
+        if (data?.authenticated) {
+          setAdminProfile(data.admin ?? null);
+          setIsAuthorised(true);
+        } else {
+          setAdminProfile(null);
+          setIsAuthorised(false);
+          router.replace("/admin/login");
+        }
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+
+        setAdminProfile(null);
+        setIsAuthorised(false);
+        router.replace("/admin/login");
+      } finally {
+        if (isActive) {
+          setIsCheckingAuth(false);
+        }
+      }
+    };
+
+    verifySession();
+
+    return () => {
+      isActive = false;
+    };
   }, [router]);
 
   const analytics = useMemo(
@@ -36,9 +66,14 @@ export default function AdminDashboardPage() {
     []
   );
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("isAdminAuthenticated");
-    router.push("/admin/login");
+  const handleLogout = async () => {
+    try {
+      await publicApi.post(API_ENDPOINTS.ADMIN_LOGOUT);
+    } catch (error) {
+      console.error("Failed to sign out", error);
+    } finally {
+      router.push("/admin/login");
+    }
   };
 
   const handleTagSubmit = (event) => {
@@ -72,7 +107,9 @@ export default function AdminDashboardPage() {
         <header className="flex flex-col gap-6 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-10 shadow-2xl sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Dashboard</p>
-            <h1 className="text-3xl font-semibold">Welcome back, Admin</h1>
+            <h1 className="text-3xl font-semibold">
+              Welcome back, {adminProfile?.username || "Admin"}
+            </h1>
             <p className="max-w-xl text-sm text-slate-400">
               Review high-level metrics and manage portfolio content in one unified workspace.
             </p>
