@@ -71,7 +71,7 @@ export default function AdminSignupPage() {
                 setUsername(event.target.value.replace(/\s+/g, ""))
               }
               required
-              pattern="^\S+$"
+              // pattern="^\S+$"
               title="Please enter a single word without spaces."
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-200"
               placeholder="admin"
@@ -91,7 +91,7 @@ export default function AdminSignupPage() {
                 setPassword(event.target.value.replace(/\s+/g, ""))
               }
               required
-              pattern="^\S+$"
+              // pattern="^\S+$"
               title="Please enter a single word without spaces."
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-200"
               placeholder="••••••"

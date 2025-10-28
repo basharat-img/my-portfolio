@@ -6,20 +6,14 @@ let clientPromise;
 
 function getMongoConfig() {
   const uri = process.env.MONGODB_URI;
-  const dbName = process.env.MONGODB_DB_NAME;
 
   if (!uri) {
     throw new Error("Missing MONGODB_URI environment variable.");
   }
-
-  if (!dbName) {
-    throw new Error("Missing MONGODB_DB_NAME environment variable.");
-  }
-
   const adminsCollection =
     process.env.MONGODB_ADMINS_COLLECTION?.trim() || "admins";
 
-  return { uri, dbName, adminsCollection };
+  return { uri, adminsCollection };
 }
 
 function createClientPromise() {
