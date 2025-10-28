@@ -41,13 +41,8 @@ function getMongoConfig() {
 
   const adminsCollection =
     process.env.MONGODB_ADMINS_COLLECTION?.trim() || "admins";
-  const dbName = extractDbName(uri);
-
-  if (!dbName) {
-    throw new Error(
-      "Unable to determine the MongoDB database name. Set MONGODB_DB or include it in the URI.",
-    );
-  }
+  const dbName =
+    extractDbName(uri) || process.env.MONGODB_DEFAULT_DB?.trim() || "portfolio";
 
   return { uri, adminsCollection, dbName };
 }
