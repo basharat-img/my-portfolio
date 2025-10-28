@@ -58,6 +58,12 @@ export default function Home() {
           >
             Documentation
           </a>
+          <a
+            className="flex h-12 w-full items-center justify-center rounded-full border border-dashed border-black/[.2] px-5 text-black transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-white/[.2] dark:text-zinc-50 dark:hover:border-indigo-400 dark:hover:text-indigo-300 md:w-[158px]"
+            href="/admin/login"
+          >
+            Admin Login
+          </a>
         </div>
       </main>
     </div>
