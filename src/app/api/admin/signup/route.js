@@ -6,12 +6,21 @@ const SINGLE_WORD_PATTERN = /^\S+$/;
 
 export async function POST(request) {
   try {
-    const { username, password } = await request.json();
+    const { email, username, password } = await request.json();
 
-    if (!username || !password) {
+    if (!email || !username || !password) {
       return NextResponse.json(
-        { message: "Username and password are required." },
+        { message: "Email, username, and password are required." },
         { status: 400 },
+      );
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      return NextResponse.json(
+        { message: "Please provide a valid email address." },
+        { status: 422 },
       );
     }
 
@@ -27,11 +36,17 @@ export async function POST(request) {
 
     const admins = await getAdminsCollection();
 
-    const existing = await admins.findOne({ username });
+    const existing = await admins.findOne({
+      $or: [{ username }, { email }],
+    });
 
     if (existing) {
+      const message =
+        existing.username === username
+          ? "An admin with that username already exists."
+          : "An admin with that email already exists.";
       return NextResponse.json(
-        { message: "An admin with that username already exists." },
+        { message },
         { status: 409 },
       );
     }
@@ -40,6 +55,7 @@ export async function POST(request) {
     const timestamp = new Date().toISOString();
 
     await admins.insertOne({
+      email,
       username,
       password: hashedPassword,
       createdAt: timestamp,
