@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { callMongoDataApi } from "@/lib/mongodb";
+import { getAdminsCollection } from "@/lib/mongodb";
 import { hashPassword } from "@/lib/password";
 
 const SINGLE_WORD_PATTERN = /^\S+$/;
@@ -25,11 +25,11 @@ export async function POST(request) {
       );
     }
 
-    const existing = await callMongoDataApi("findOne", {
-      filter: { username },
-    });
+    const admins = await getAdminsCollection();
 
-    if (existing.document) {
+    const existing = await admins.findOne({ username });
+
+    if (existing) {
       return NextResponse.json(
         { message: "An admin with that username already exists." },
         { status: 409 },
@@ -39,13 +39,11 @@ export async function POST(request) {
     const hashedPassword = hashPassword(password);
     const timestamp = new Date().toISOString();
 
-    await callMongoDataApi("insertOne", {
-      document: {
-        username,
-        password: hashedPassword,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
+    await admins.insertOne({
+      username,
+      password: hashedPassword,
+      createdAt: timestamp,
+      updatedAt: timestamp,
     });
 
     return NextResponse.json(

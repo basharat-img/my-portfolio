@@ -1,49 +1,44 @@
-const REQUIRED_ENV_VARS = [
-  "MONGODB_DATA_API_URL",
-  "MONGODB_DATA_API_KEY",
-  "MONGODB_DATA_SOURCE",
-  "MONGODB_DATA_DATABASE",
-  "MONGODB_DATA_COLLECTION",
-];
+import { MongoClient } from "mongodb";
 
-export function assertMongoConfig() {
-  const missing = REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
-  if (missing.length > 0) {
-    throw new Error(
-      `Missing MongoDB Data API environment variables: ${missing.join(", ")}`,
-    );
+const globalForMongo = globalThis;
+
+let clientPromise;
+
+function getMongoConfig() {
+  const uri = process.env.MONGODB_URI;
+  const dbName = process.env.MONGODB_DB_NAME;
+
+  if (!uri) {
+    throw new Error("Missing MONGODB_URI environment variable.");
   }
-  return {
-    apiUrl: process.env.MONGODB_DATA_API_URL,
-    apiKey: process.env.MONGODB_DATA_API_KEY,
-    dataSource: process.env.MONGODB_DATA_SOURCE,
-    database: process.env.MONGODB_DATA_DATABASE,
-    collection: process.env.MONGODB_DATA_COLLECTION,
-  };
+
+  if (!dbName) {
+    throw new Error("Missing MONGODB_DB_NAME environment variable.");
+  }
+
+  const adminsCollection =
+    process.env.MONGODB_ADMINS_COLLECTION?.trim() || "admins";
+
+  return { uri, dbName, adminsCollection };
 }
 
-export async function callMongoDataApi(action, payload) {
-  const config = assertMongoConfig();
-  const response = await fetch(`${config.apiUrl}/action/${action}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Request-Headers": "*",
-      "api-key": config.apiKey,
-    },
-    body: JSON.stringify({
-      dataSource: config.dataSource,
-      database: config.database,
-      collection: config.collection,
-      ...payload,
-    }),
-    cache: "no-store",
+function createClientPromise() {
+  const { uri } = getMongoConfig();
+  const client = new MongoClient(uri, {
+    maxIdleTimeMS: 60_000,
+    serverSelectionTimeoutMS: 5_000,
   });
+  return client.connect();
+}
 
-  const json = await response.json();
-  if (!response.ok) {
-    const errorMessage = json.error || "MongoDB Data API request failed";
-    throw new Error(errorMessage);
-  }
-  return json;
+if (!globalForMongo._mongoClientPromise) {
+  globalForMongo._mongoClientPromise = createClientPromise();
+}
+
+clientPromise = globalForMongo._mongoClientPromise;
+
+export async function getAdminsCollection() {
+  const { dbName, adminsCollection } = getMongoConfig();
+  const client = await clientPromise;
+  return client.db(dbName).collection(adminsCollection);
 }

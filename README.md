@@ -20,20 +20,25 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 ## MongoDB Atlas configuration
 
-The admin sign-up flow uses the MongoDB Atlas Data API. Create a `.env.local` file based on `.env.example` and provide your Atlas credentials:
+The admin sign-up flow connects directly to MongoDB using the official driver. Create a `.env.local` file based on `.env.example` and provide your Atlas connection string details:
 
 ```bash
 cp .env.example .env.local
-# Then populate each value with your Atlas Data API settings
+# Then populate each value with your Atlas connection information
 ```
 
 | Variable | Description |
 | --- | --- |
-| `MONGODB_DATA_API_URL` | Base URL for the Data API endpoint (e.g. `https://data.mongodb-api.com/app/<APP_ID>/endpoint/data/v1`). |
-| `MONGODB_DATA_API_KEY` | A Data API key with insert/read access. |
-| `MONGODB_DATA_SOURCE` | Atlas cluster or data source name. |
-| `MONGODB_DATA_DATABASE` | Database that stores admin users. |
-| `MONGODB_DATA_COLLECTION` | Collection for admin users (defaults to `admins`). |
+| `MONGODB_URI` | Standard MongoDB connection string that includes authentication credentials. |
+| `MONGODB_DB_NAME` | Database that stores admin users. |
+| `MONGODB_ADMINS_COLLECTION` | *(Optional)* Collection for admin users (defaults to `admins`). |
+
+After setting the environment variables, install dependencies (including `mongodb`) and run the app:
+
+```bash
+npm install
+npm run dev
+```
 
 The sign-up API checks for existing usernames, enforces single-word values for each admin field, hashes the password with `scrypt`, and stores timestamps for auditing.
 
