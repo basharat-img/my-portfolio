@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "formik": ["./src/lib/formik"],
+      "yup": ["./src/lib/yup"]
     }
   }
 }
