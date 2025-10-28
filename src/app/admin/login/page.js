@@ -25,16 +25,28 @@ export default function AdminLoginPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const isAuthenticated =
-      typeof window !== "undefined" &&
-      sessionStorage.getItem("isAdminAuthenticated") === "true";
+    let isActive = true;
 
-    if (isAuthenticated) {
-      router.replace("/admin");
-      return;
-    }
+    const checkSession = async () => {
+      try {
+        await publicApi.get(API_ENDPOINTS.ADMIN_SESSION);
+        if (!isActive) {
+          return;
+        }
+        router.replace("/admin");
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+        setIsCheckingAuth(false);
+      }
+    };
 
-    setIsCheckingAuth(false);
+    checkSession();
+
+    return () => {
+      isActive = false;
+    };
   }, [router]);
 
   if (isCheckingAuth) {
@@ -67,9 +79,12 @@ export default function AdminLoginPage() {
                 password: values.password.trim(),
               };
 
-              await publicApi.post(API_ENDPOINTS.ADMIN_LOGIN, trimmedValues);
+              const { data } = await publicApi.post(
+                API_ENDPOINTS.ADMIN_LOGIN,
+                trimmedValues,
+              );
 
-              sessionStorage.setItem("isAdminAuthenticated", "true");
+              setStatus({ success: data?.message || "Signed in successfully." });
               router.push("/admin");
             } catch (error) {
               setStatus({ error: error.message || "Something went wrong while signing in." });
@@ -135,6 +150,11 @@ export default function AdminLoginPage() {
               {status?.error ? (
                 <p className="text-sm font-medium text-rose-400" role="alert">
                   {status.error}
+                </p>
+              ) : null}
+              {status?.success ? (
+                <p className="text-sm font-medium text-emerald-400" role="status">
+                  {status.success}
                 </p>
               ) : null}
               <Button

@@ -41,16 +41,28 @@ export default function AdminSignUpPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const isAuthenticated =
-      typeof window !== "undefined" &&
-      sessionStorage.getItem("isAdminAuthenticated") === "true";
+    let isActive = true;
 
-    if (isAuthenticated) {
-      router.replace("/admin");
-      return;
-    }
+    const checkSession = async () => {
+      try {
+        await publicApi.get(API_ENDPOINTS.ADMIN_SESSION);
+        if (!isActive) {
+          return;
+        }
+        router.replace("/admin");
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+        setIsCheckingAuth(false);
+      }
+    };
 
-    setIsCheckingAuth(false);
+    checkSession();
+
+    return () => {
+      isActive = false;
+    };
   }, [router]);
 
   if (isCheckingAuth) {
