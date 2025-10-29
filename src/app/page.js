@@ -7,7 +7,7 @@ export default function Home() {
       <main className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col justify-center px-6 py-24 sm:px-10 lg:px-20">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_45%),_radial-gradient(circle_at_bottom,_rgba(249,115,22,0.2),_transparent_55%)]" />
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-end">
-          <div className="group relative h-56 w-56 overflow-hidden rounded-[3rem] border border-white/10 bg-slate-900/60 shadow-[0_30px_80px_rgba(15,23,42,0.55)] backdrop-blur">
+          <div className="group relative h-56 w-56 overflow-hidden border border-white/10 bg-slate-900/60 shadow-[0_30px_80px_rgba(15,23,42,0.55)] backdrop-blur">
             <Image
               src="/alex-rivera-portrait.svg"
               alt="Alex Rivera portrait"

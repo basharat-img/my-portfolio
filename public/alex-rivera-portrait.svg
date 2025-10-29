@@ -1,5 +1,5 @@
-<svg width="640" height="800" viewBox="0 0 640 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="640" height="800" rx="120" fill="url(#paint0_linear)" />
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="640" fill="url(#paint0_linear)" />
   <g filter="url(#filter0_f)">
     <ellipse cx="220" cy="200" rx="160" ry="150" fill="#38BDF8" fill-opacity="0.35" />
   </g>
@@ -7,7 +7,7 @@
     <ellipse cx="430" cy="340" rx="180" ry="180" fill="#F97316" fill-opacity="0.28" />
   </g>
   <g filter="url(#filter2_f)">
-    <ellipse cx="320" cy="600" rx="220" ry="160" fill="#A855F7" fill-opacity="0.32" />
+    <ellipse cx="320" cy="500" rx="220" ry="120" fill="#A855F7" fill-opacity="0.32" />
   </g>
   <path
     d="M320 188C355.347 188 384 158.972 384 122C384 85.0285 355.347 56 320 56C284.653 56 256 85.0285 256 122C256 158.972 284.653 188 320 188Z"
@@ -45,12 +45,12 @@
       <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
       <feGaussianBlur stdDeviation="45" result="effect1_foregroundBlur" />
     </filter>
-    <filter id="filter2_f" x="60" y="380" width="520" height="440" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+    <filter id="filter2_f" x="60" y="260" width="520" height="380" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
       <feFlood flood-opacity="0" result="BackgroundImageFix" />
       <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
       <feGaussianBlur stdDeviation="50" result="effect1_foregroundBlur" />
     </filter>
-    <linearGradient id="paint0_linear" x1="96" y1="56" x2="544" y2="744" gradientUnits="userSpaceOnUse">
+    <linearGradient id="paint0_linear" x1="96" y1="56" x2="544" y2="608" gradientUnits="userSpaceOnUse">
       <stop stop-color="#020617" />
       <stop offset="1" stop-color="#0F172A" />
     </linearGradient>
