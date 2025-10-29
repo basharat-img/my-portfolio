@@ -6,14 +6,13 @@ export default function Home() {
       <main className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col justify-center px-6 py-24 sm:px-10 lg:px-20">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_45%),_radial-gradient(circle_at_bottom,_rgba(249,115,22,0.2),_transparent_55%)]" />
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-end">
-          <div className="group relative h-40 w-40 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/60 shadow-[0_20px_60px_rgba(15,23,42,0.6)] backdrop-blur">
+          <div className="group relative h-56 w-56 overflow-hidden rounded-[3rem] border border-white/10 bg-slate-900/60 shadow-[0_30px_80px_rgba(15,23,42,0.55)] backdrop-blur">
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 via-fuchsia-500/30 to-orange-400/40 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
-            <div className="flex h-full w-full items-center justify-center text-5xl font-semibold tracking-tight text-white">
+            <div className="flex h-full w-full items-center justify-center text-6xl font-semibold tracking-tight text-white">
               AR
             </div>
           </div>
           <div className="flex max-w-2xl flex-col items-center text-center lg:items-start lg:text-left">
-            <p className="text-sm uppercase tracking-[0.4em] text-cyan-300/90">Hero / Introduction</p>
             <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
               Hi, I’m Alex Rivera — a full-stack developer based in Austin, Texas.
             </h1>
